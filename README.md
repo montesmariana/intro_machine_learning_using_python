@@ -9,7 +9,7 @@ The code has been developed by Elmo Geeraerts.
 Clone this repository with the following git command in the console (or download the ZIP file via GitHub):
 
 ```sh
-git clone git@github.com:montesmariana/intro_machine_learning_using_python
+git clone https://github.com/ElmoGeeraerts/intro_machine_learning_using_python
 ```
 
 You can import the script as a module by adding the repository to your path in a Python script or interactive notebook and then calling `import`.
