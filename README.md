@@ -1,4 +1,4 @@
-# A script to make you proud
+# A script to make you proud -- really!
 
 This repository contains a small Python program that shows that I have learned Python in this semester.
 
