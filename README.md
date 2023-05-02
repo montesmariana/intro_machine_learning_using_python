@@ -41,3 +41,5 @@ python script.py --help
 ```
 
 If you run this script, you become proud of yourself.
+
+# First, I'll try to make a few changes though
