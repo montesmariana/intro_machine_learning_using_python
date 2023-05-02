@@ -2,7 +2,7 @@
 
 This repository contains a small Python program that shows that I have learned Python in this semester.
 
-The code has been developed by Mariana Montes.
+The code has been developed by Elmo Geeraerts.
 
 ## Installation and usage
 
