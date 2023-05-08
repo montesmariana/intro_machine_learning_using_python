@@ -5,8 +5,10 @@
     - Translator
     - Revisor
     - Status
-    -> The default value for "Translator" and "Revisor" is "Internal", meaning that an employee of the translation agency took up the job. If the agency assigned the job to a freelancer, the default value can be changed to their name.
-    -> The default value for "Status" is "Created". The status can then be updated as the project progresses to "In translation", "In revision", "Delivered", "Delayed" or "Cancelled". If possible, the script should only accept these six labels to prevent organisational chaos due to everyone using their own labels.
+   
+   -> The default value for "Translator" and "Revisor" is "Internal", meaning that an employee of the translation agency took up the job. If the agency assigned the job to a freelancer, the default value can be changed to their name.
+   
+   -> The default value for "Status" is "Created". The status can then be updated as the project progresses to "In translation", "In revision", "Delivered", "Delayed" or "Cancelled". If possible, the script should only accept these six labels to prevent organisational chaos due to everyone using their own labels.
 - Instance and computed attributes remain the same as in the first assignment (with some edits to add the advice from the first assignment's feedback).
 - Add validation for unexpected input (+ for "Status" labels different from the six authorised labels?)
 - Add methods (?) to call the computed attributes and get a result that's more legible than what this currently generates (for example "22 days" instead of "datetime.timedelta(days=22)")
