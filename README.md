@@ -17,7 +17,7 @@
 # What I'd like to add but don't know how
 
 - It would be neat if I could do something with the translation memory and termbase of each project. Maybe add a method that opens them for a preview?
-- It would also be super useful to have a way to align a source and a target text and generate a file that can be added to a translation memory. So, to start from two docx-files (or txt-files), split them into sentences and pair each sentence in the source text with the corresponding sentence in the target text and generate a single csv-file with the paired sentences. Ideally, the context (i.e. the surrounding sentences) should also be considered, but if that's not possible an aligned xml would already be awesome.
+- It would also be super useful to have a way to align a source and a target text and generate a file that can be added to a translation memory. So, to start from two docx-files (or txt-files), split them into sentences and pair each sentence in the source text with the corresponding sentence in the target text and generate a single csv-file with the paired sentences. Ideally, the context (i.e. the surrounding sentences) should also be considered, but if that's not possible an aligned csv would already be awesome.
 
 # Things I'm not yet sure how to integrate into the assignment
 
