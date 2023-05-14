@@ -1,6 +1,6 @@
-# A script to make you proud
+# Script: Translation Vendor Database
 
-This repository contains a small Python program that shows that I have learned Python in this semester.
+This repository contains a Python program that could help a translation agency to keep track of a vendor database. The idea is to make it easier for project managers to keep track of who the preferred and back-up vendors are for a project, in which languages they work, what their contact details and rates are and other information that might be useful for the PMs.
 
 The code has been developed by Elmo Geeraerts.
 
@@ -9,7 +9,7 @@ The code has been developed by Elmo Geeraerts.
 Clone this repository with the following git command in the console (or download the ZIP file via GitHub):
 
 ```sh
-git clone https://github.com/ElmoGeeraerts/intro_machine_learning_using_python
+git clone https://github.com/ElmoGeeraerts/intro_machine_learning_using_python.git
 ```
 
 You can import the script as a module by adding the repository to your path in a Python script or interactive notebook and then calling `import`.
