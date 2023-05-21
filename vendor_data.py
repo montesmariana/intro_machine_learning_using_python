@@ -14,15 +14,17 @@ The script contains three classes:
     2. The subclass ´PrefVendor´, for the preferred vendors. They are assigned the status "Preferred".
     3. The subclass ´BackupVendor´ for the back-up vendors. They are assigned the status "Back-up"
 """
+
 import argparse
 import re
+import pandas as pd
 
 class VendorData:
     ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
     SourceLang = "English" #Class attribute no.2, the source language
     CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"] #Class attribute no.3, the list of possible Cat Tools
     
-    def __init__(self, VendorName, TargLang, WordRate = None, VendorMail = "", CatTool = "XTM"):
+    def __init__(self, VendorName, TargLang, WordRate, VendorMail = "", CatTool = "XTM"):
         """ Instantiate
         Args:
             "VendorName" (str): First and last name of the vendor
@@ -87,6 +89,19 @@ class VendorData:
             self.VendorMail = mail
         else:
             raise ValueError("Please insert a valid email address.")
+            
+   
+    def to_excel(self):
+        data = {
+            "Target Language": [self.TargLang],
+            "Vendor": [self.VendorName],
+            "E-mail": [self.VendorMail],
+            "Word rate": [self.WordRate],
+            "CAT-tool": [self.CatTool]
+        }
+        filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
+        df = pd.DataFrame(data)
+        df.to_excel(f"{filename}.xlsx", index=False, sheet_name="VendorData")
 
         
 class PrefVendor(VendorData):
@@ -96,6 +111,7 @@ class PrefVendor(VendorData):
     
     def __init__(self, VendorName, TargLang, WordRate, VendorMail, CatTool):
         super().__init__(VendorName, TargLang, WordRate, VendorMail, CatTool)
+
 
 
 # don't forget to properly dcument them with docstrings!!
