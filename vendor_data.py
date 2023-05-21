@@ -19,7 +19,6 @@ import argparse
 import re
 import pandas as pd
 import os
-from openpyxl import load_workbook
 
 class VendorData:
     ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
