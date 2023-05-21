@@ -18,6 +18,8 @@ The script contains three classes:
 import argparse
 import re
 import pandas as pd
+import os
+from openpyxl import load_workbook
 
 class VendorData:
     ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
@@ -88,8 +90,7 @@ class VendorData:
         if (re.search(regex_mail,mail)):
             self.VendorMail = mail
         else:
-            raise ValueError("Please insert a valid email address.")
-            
+            raise ValueError("Please insert a valid email address.")      
    
     def to_excel(self):
         data = {
@@ -101,16 +102,34 @@ class VendorData:
         }
         filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
         df = pd.DataFrame(data)
-        df.to_excel(f"{filename}.xlsx", index=False, sheet_name="VendorData")
-
-        
+        if os.path.exists(f"{filename}.xlsx") != True:
+            df.to_excel(f"{filename}.xlsx", index=False, sheet_name="VendorData")
+        else:
+            with pd.ExcelWriter(f"{filename}.xlsx", mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
+                df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
 class PrefVendor(VendorData):
     Preferred = True
     """ Class Attribute:
             Preffered (bool.) by default set to "True" indicating this is a Preferred Vendor, if "False" it is a back-up vendor."""
     
-    def __init__(self, VendorName, TargLang, WordRate, VendorMail, CatTool):
+    def __init__(self, VendorName, TargLang, WordRate, VendorMail="", CatTool = "XTM"):
         super().__init__(VendorName, TargLang, WordRate, VendorMail, CatTool)
+    
+    def to_excel(self):
+        data = {
+            "Target Language": [self.TargLang],
+            "Vendor": [self.VendorName],
+            "E-mail": [self.VendorMail],
+            "Word rate": [self.WordRate],
+            "CAT-tool": [self.CatTool]
+        }
+        filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
+        df = pd.DataFrame(data)
+        if os.path.exists(f"{filename}.xlsx") != True:
+            df.to_excel(f"{filename}.xlsx", index=False, sheet_name="VendorData")
+        else:
+            with pd.ExcelWriter(f"{filename}.xlsx", mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
+                df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
 
 
 
