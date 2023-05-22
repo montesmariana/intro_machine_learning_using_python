@@ -1,0 +1,1 @@
+Introduction to Machine Learning with Python.This module provides an introduction to the basic concepts and use of the Python programming language in support of translation. Focus lies on the main concepts that include Natural Language Processing, automation, text analysis and machine learning.
