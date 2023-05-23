@@ -19,11 +19,13 @@ import argparse
 import re
 import pandas as pd
 import os
+import pyinputplus as pyip
 
 class VendorData:
     ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
     SourceLang = "English" #Class attribute no.2, the source language
     CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"] #Class attribute no.3, the list of possible Cat Tools
+    Status = "Potential"
     
     def __init__(self, VendorName, TargLang, WordRate, VendorMail = "", CatTool = "XTM"):
         """ Instantiate
@@ -106,8 +108,10 @@ class VendorData:
         else:
             with pd.ExcelWriter(f"{filename}.xlsx", mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
+
 class PrefVendor(VendorData):
     Preferred = True
+    Status = "Preferred"
     """ Class Attribute:
             Preffered (bool.) by default set to "True" indicating this is a Preferred Vendor, if "False" it is a back-up vendor."""
     
@@ -129,6 +133,13 @@ class PrefVendor(VendorData):
         else:
             with pd.ExcelWriter(f"{filename}.xlsx", mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
+
+    def change_status(self):
+        self.Preferred = False
+        if self.Preferred == True:
+            self.Status = "Preferred"
+        else:
+            self.Status = "Back-Up"
 
 
 
