@@ -142,10 +142,9 @@ class VendorData:
         data = {
             "Target Language": [self.TargLang],
             "Vendor": [self.VendorName],
-            "Word Rate": [self.WordRate],
-            "Status": [self.Status],
             "E-mail": [self.VendorMail],
-            "CAT Tool": [self.CatTool]
+            "CAT Tool": [self.CatTool],
+            "Status": [self.Status],
         }
         filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
         df = pd.DataFrame(data)
@@ -166,19 +165,13 @@ if __name__ == "__main__":
     
     if args.add == True:
         done = "no"
-        VendorName = ""
-        TargLang = ""
-        WordRate = None
-        Preferred = None
-        VendorMail = ""
-        CatTool = ""
         while done.lower() != "yes":
-            VendorName = pyip.inputStr(f"What's the vendor's name? (Previous value: {VendorName}) ")
-            TargLang = pyip.inputStr(f"Into which language will the vendor translate? (Previous value: {TargLang}) ")
-            WordRate = pyip.inputNum(f"What is the vendor's word rate in EUR? (Previous value: {WordRate}) ", blank = True)
-            Preferred = pyip.inputBool(f"True or False: Is this vendor a preferred vendor? If neither, leave blank. (Previous value: {Preferred}) ", blank = True)
-            VendorMail = pyip.inputStr(f"What is the vendor's email address? (Previous value: {VendorMail}) ", blank = True)
-            CatTool= pyip.inputStr(f"In which tool will the vendor be working? (Previous value: {CatTool}) ", blank = True)
+            VendorName = pyip.inputStr(f"What's the vendor's name?")
+            TargLang = pyip.inputStr(f"Into which language will the vendor translate?")
+            WordRate = pyip.inputNum(f"What is the vendor's word rate in EUR?", blank = True, default=None)
+            Preferred = pyip.inputBool(f"True or False: Is this vendor a preferred vendor? If neither, leave blank.", blank = True, default=None)
+            VendorMail = pyip.inputStr(f"What is the vendor's email address?", blank = True, default="")
+            CatTool= pyip.inputStr(f"In which tool will the vendor be working?", blank = True, default = "XTM")
             done = pyip.inputStr("Are you done? ")
             if done.lower() == "yes":
                 Vndr=VendorData(VendorName, TargLang, WordRate, Preferred, VendorMail, CatTool)
