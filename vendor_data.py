@@ -26,7 +26,6 @@ class VendorData:
     ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
     SourceLang = "English" #Class attribute no.2, the source language
     CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"] #Class attribute no.3, the list of possible Cat Tools
-    Preference = [True, False, None]
     
     def __init__(self, VendorName, TargLang, WordRate = None, Preferred = None, VendorMail = "", CatTool = "XTM"):
         """ Instantiate
@@ -70,14 +69,11 @@ class VendorData:
         else:
             self.WordRate = WordRate
             
-        if Preferred in VendorData.Preference:
-            self.Preferred = Preferred
-        else:
-            raise ValueError("Run 'VendorData.Preference' to check options!")
-        if Preferred == True:
-            self.Status = "Preferred"
-        elif Preferred == False:
-            self.Status = "Back-up"
+        if Preferred != None:
+            if Preferred == True:
+                self.Status = "Preferred"
+            elif Preferred == False:
+                self.Status = "Back-up"
         else:
             self.Status = "Potential"
             
@@ -138,13 +134,14 @@ class VendorData:
             self.CatTool = tool
     
    
-    def to_excel(self):
+    def to_excel (self):
         data = {
             "Target Language": [self.TargLang],
             "Vendor": [self.VendorName],
             "E-mail": [self.VendorMail],
             "CAT Tool": [self.CatTool],
-            "Status": [self.Status],
+            "Word Rate": [self.WordRate],
+            "Status": [self.Status]
         }
         filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
         df = pd.DataFrame(data)
@@ -165,13 +162,21 @@ if __name__ == "__main__":
     
     if args.add == True:
         done = "no"
+        WordRate = None
+        Preferred = None
+        VendorMail = ""
+        CatTool = "XTM"
         while done.lower() != "yes":
             VendorName = pyip.inputStr(f"What's the vendor's name?")
             TargLang = pyip.inputStr(f"Into which language will the vendor translate?")
-            WordRate = pyip.inputNum(f"What is the vendor's word rate in EUR?", blank = True, default=None)
-            Preferred = pyip.inputBool(f"True or False: Is this vendor a preferred vendor? If neither, leave blank.", blank = True, default=None)
-            VendorMail = pyip.inputStr(f"What is the vendor's email address?", blank = True, default="")
-            CatTool= pyip.inputStr(f"In which tool will the vendor be working?", blank = True, default = "XTM")
+            NewWordRate = pyip.inputNum(f"What is the vendor's word rate in EUR?", blank = True)
+            VendorWordRate = NewWordRate if NewWordRate else WordRate
+            NewPreferred = pyip.inputBool(f"True or False: Is this vendor a preferred vendor? If neither, leave blank.", blank = True, default=None)
+            Preferred = NewPreferred if NewPreferred else Preferred
+            NewVendorMail = pyip.inputStr(f"What is the vendor's email address?", blank = True, default="")
+            VendorMail = NewVendorMail if NewVendorMail else VendorMail
+            NewCatTool= pyip.inputStr(f"In which tool will the vendor be working?", blank = True, default = "XTM")
+            CatTool = NewCatTool if NewCatTool else CatTool
             done = pyip.inputStr("Are you done? ")
             if done.lower() == "yes":
                 Vndr=VendorData(VendorName, TargLang, WordRate, Preferred, VendorMail, CatTool)
