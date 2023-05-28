@@ -17,7 +17,7 @@ You can import the script as a module by adding the repository to your path in a
 ```python
 import sys
 sys.path.append('/path/to/intro_machine_learning_using_python')
-import script as s
+import vendor_data as vd
 ```
 
 Check out `tutorial.md` to see an example of the different functionalities of the script!
@@ -25,19 +25,19 @@ Check out `tutorial.md` to see an example of the different functionalities of th
 You can also run the script directly with the following code in a console:
 
 ```sh
-python script.py <example.json>
+python vendor_data.py <example.json>
 ```
 
 Or in Jupyter notebook with:
 
 ```python
-%run script.py <example.json>
+%run vendor_data.py <example.json>
 ```
 
 In both cases `example.json` stands for the `filename` argument that the script needs. You can use [the file in this repository](example.json) or a similar file of yours. Find more information on how this script works with:
 
 ```sh
-python script.py --help
+python vendor_data.py --help
 ```
 
-If you run this script, you become proud of yourself.
+If you run this script, you can easily write an excel file that gives an overview of the vendors working on the project. The excel file will be named after the project name and the source language: projectname_sourcelanguage.xlsx

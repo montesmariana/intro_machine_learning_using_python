@@ -23,11 +23,9 @@ import os
 import pyinputplus as pyip
 
 class VendorData:
-    ProjectName = "Toyota MM24" #Class attribute no.1, the project the vendors will be working on
-    SourceLang = "English" #Class attribute no.2, the source language
-    CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"] #Class attribute no.3, the list of possible Cat Tools
+    CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"]
     
-    def __init__(self, VendorName, TargLang, WordRate = None, Preferred = None, VendorMail = "", CatTool = "XTM"):
+    def __init__(self, ProjectName, SourceLang, VendorName, TargLang, WordRate = None, Preferred = None, VendorMail = "", CatTool = "XTM"):
         """ Instantiate
         Args:
             "VendorName" (str): First and last name of the vendor
@@ -49,6 +47,15 @@ class VendorData:
         """
         regex_mail = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$" #regex used to validate email
         
+        
+        if type(ProjectName) != str:
+            raise TypeError("ProjectName should be a string!")
+        else:
+            self.ProjectName = ProjectName
+        if type(SourceLang) != str:
+            raise TypeError("SourceLang should be a string!")
+        else:
+            self.SourceLang = SourceLang
         if type(VendorName) !=str:
             raise TypeError("VendorName should be a string!")
         else:
@@ -63,7 +70,7 @@ class VendorData:
             if type(WordRate) != float:
                 raise TypeError("WordRate should be a float!")
             if WordRate > 0.15:
-                raise ValueError("This vendor is too expensive, consider another one.")
+                raise ValueError("This vendor is too expensive, pick another one.")
             if WordRate == 0.00:
                 raise ValueError("Word rate cannot be 0.00.")
         else:
@@ -143,18 +150,17 @@ class VendorData:
             "Word Rate": [self.WordRate],
             "Status": [self.Status]
         }
-        filename = "_".join([str(self.ProjectName), str(self.SourceLang)])
+        filename = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
         df = pd.DataFrame(data)
-        if os.path.exists(f"{filename}.xlsx") != True:
-            df.to_excel(f"{filename}.xlsx", index=False, sheet_name="VendorData")
+        if os.path.exists(filename) != True:
+            df.to_excel(filename, index=False, sheet_name="VendorData")
         else:
-            with pd.ExcelWriter(f"{filename}.xlsx", mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
+            with pd.ExcelWriter(filename, mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
 
 # don't forget to properly dcument them with docstrings!!
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--add", action='store_true', help = "Add a vendor")
     parser.add_argument ("-m", "--modify", action='store_true', help = "Modify an existing vendor")
@@ -167,19 +173,21 @@ if __name__ == "__main__":
         VendorMail = ""
         CatTool = "XTM"
         while done.lower() != "yes":
-            VendorName = pyip.inputStr(f"What's the vendor's name?")
-            TargLang = pyip.inputStr(f"Into which language will the vendor translate?")
-            NewWordRate = pyip.inputNum(f"What is the vendor's word rate in EUR?", blank = True)
+            ProjectName = pyip.inputStr("What is the project name? ")
+            SourceLang = pyip.inputStr("What is the source language? ")
+            VendorName = pyip.inputStr("What's the vendor's name? ")
+            TargLang = pyip.inputStr("Into which language will the vendor translate? ")
+            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor.", blank = True)
             VendorWordRate = NewWordRate if NewWordRate else WordRate
-            NewPreferred = pyip.inputBool(f"True or False: Is this vendor a preferred vendor? If neither, leave blank.", blank = True, default=None)
+            NewPreferred = pyip.inputBool("True or False: Is this vendor a preferred vendor? If neither, leave blank. ", blank = True, default=None)
             Preferred = NewPreferred if NewPreferred else Preferred
-            NewVendorMail = pyip.inputStr(f"What is the vendor's email address?", blank = True, default="")
+            NewVendorMail = pyip.inputStr("What is the vendor's email address? ", blank = True, default="")
             VendorMail = NewVendorMail if NewVendorMail else VendorMail
-            NewCatTool= pyip.inputStr(f"In which tool will the vendor be working?", blank = True, default = "XTM")
+            NewCatTool= pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "MemSource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
             CatTool = NewCatTool if NewCatTool else CatTool
             done = pyip.inputStr("Are you done? ")
             if done.lower() == "yes":
-                Vndr=VendorData(VendorName, TargLang, WordRate, Preferred, VendorMail, CatTool)
-                Excel = pyip.inputStr(f"Do you want add this vendor to the excel file?")
+                Vndr=VendorData(ProjectName, SourceLang, VendorName, TargLang, WordRate, Preferred, VendorMail, CatTool)
+                Excel = pyip.inputStr("Do you want add this vendor to the excel file? ")
                 if Excel.lower() == "yes":
                     Vndr.to_excel()
