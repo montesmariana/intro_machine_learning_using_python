@@ -22,6 +22,13 @@ import pandas as pd
 import os
 import pyinputplus as pyip
 
+def change_dictionary_value(dictionary, key, index, new_value):
+    if key in dictionary and index in dictionary[key]:
+        dictionary[key][index] = new_value
+        return True
+    else:
+        return False
+
 class VendorData:
     CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"]
     
@@ -177,13 +184,13 @@ if __name__ == "__main__":
             SourceLang = pyip.inputStr("What is the source language? ")
             VendorName = pyip.inputStr("What's the vendor's name? ")
             TargLang = pyip.inputStr("Into which language will the vendor translate? ")
-            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor.", blank = True)
+            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
             VendorWordRate = NewWordRate if NewWordRate else WordRate
             NewPreferred = pyip.inputBool("True or False: Is this vendor a preferred vendor? If neither, leave blank. ", blank = True, default=None)
             Preferred = NewPreferred if NewPreferred else Preferred
             NewVendorMail = pyip.inputStr("What is the vendor's email address? ", blank = True, default="")
             VendorMail = NewVendorMail if NewVendorMail else VendorMail
-            NewCatTool= pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "MemSource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
+            NewCatTool= pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "Memsource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
             CatTool = NewCatTool if NewCatTool else CatTool
             done = pyip.inputStr("Are you done? ")
             if done.lower() == "yes":
@@ -191,3 +198,48 @@ if __name__ == "__main__":
                 Excel = pyip.inputStr("Do you want add this vendor to the excel file? ")
                 if Excel.lower() == "yes":
                     Vndr.to_excel()
+    if args.modify == True:
+        done = "no"
+        while done.lower() != "yes":
+            ProjectName = pyip.inputStr("What is the name of the project that the vendor you want to modify works on? ")
+            SourceLang = pyip.inputStr("What is the source language? ")
+            filename = "_".join([str(ProjectName), str(SourceLang)]) + ".xlsx"
+            if os.path.exists(filename):
+                excel_records = pd.read_excel(filename)
+                excel_records_df = excel_records.loc[:, ~excel_records.columns.str.contains('^Unnamed')]
+                VendorDict=excel_records_df.to_dict()
+
+                vendors = VendorDict["Vendor"]
+                print ("These are the vendor's already in the database: ")
+                for index, vendor_name in vendors.items():
+                    print(f"{index}: {vendor_name}")
+                
+                vendor_index = pyip.inputInt("Enter the index of the vendor you want to modify: ")
+                if vendor_index in vendors:
+                    vendor_key = "Vendor"
+                    email_key = "E-mail"
+                    cat_tool_key = "CAT Tool"
+                    word_rate_key = "Word Rate"
+                    status_key = "Status"
+
+                    new_email = pyip.inputStr("What is the vendor's e-mail? ", blank = True)
+                    new_cat_tool = pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "Memsource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
+                    new_word_rate = pyip.inputNum("What is the vendor's word rate? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
+                    new_status = pyip.inputMenu(["Potential", "Preferred", "Back-up"], prompt = "What is the vendor's new status? ", blank = True)
+                    done = pyip.inputStr("Are you done? ")
+            if done.lower() == "yes":
+
+                    if new_email:
+                        change_dictionary_value(VendorDict, email_key, vendor_index, new_email)
+                    if new_cat_tool:
+                        change_dictionary_value(VendorDict, cat_tool_key, vendor_index, new_cat_tool)
+                    if new_word_rate:
+                        change_dictionary_value(VendorDict, word_rate_key, vendor_index, new_word_rate)
+                    if new_status:
+                        change_dictionary_value(VendorDict, status_key, vendor_index, new_status)
+                    df = pd.DataFrame(VendorDict)
+                    with pd.ExcelWriter(filename, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
+                        df.to_excel(writer, sheet_name = "VendorData", index=False)
+                        print("This vendor is modified correctly.")
+            else:
+                print("A file for this project and this source language does not yet exist. Check the project name and source language.")
