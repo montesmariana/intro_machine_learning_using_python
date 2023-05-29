@@ -121,10 +121,6 @@ class VendorData:
             self.WordRate = NewRate
 
     def set_status(self, PrefVend):
-        if PrefVend in VendorData.Preference:
-            PrefVend = PrefVend
-        else:
-            raise ValueError("Run 'VendorData.Preference' to check options!")
         if PrefVend == True:
             self.Status = "Preferred"
         elif PrefVend == False:
