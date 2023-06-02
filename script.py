@@ -106,14 +106,20 @@ class Project:
             self.tm = tm
         if type(translator) != str:
             raise TypeError("The translator's name must be a string.")
+        elif translator == '':
+            self.translator = "internal"
         else:
             self.translator = translator
         if type(revisor) != str:
             raise TypeError("The revisor's name must be a string.")
+        elif revisor == '':
+            self.revisor = "internal"
         else:
             self.revisor = revisor
         if type(status) != str:
             raise TypeError("The status must be a string.")
+        elif status == '':
+            self.status = "created"
         elif not status.lower() in ["created",
                                      "in translation",
                                      "in revision",
