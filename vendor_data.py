@@ -1,150 +1,89 @@
 #! /usr/bin/python
 
-"""This script is meant to help Translation Project Managers with keeping a clear overview of the vendors participating in a project.
-
-The script contains three classes:
-    1. The main parent class ´VendorData´. This class is meant for a general potential vendor profile, without assigning a status (preferred/back-up).
-       It has 4 class attributes ´ProjectName´, representing the project name and ´SourceLang´, the source language the translators will be translating from (by default set to English), 
-       ´CatTools´, the possible Cat Tools the translator can use and ´Status´ which is by default set to "Potential". 
-       It takes 5 arguments:
-            - ´VendorName´: The first and last name of the vendor.
-            - ´TargLang´: the language the translators will be translating into.
-            - ´WordRate´: the translator's word rate in Euro.
-            - ´VendorMail´: The vendor's email address.
-            -  ´CatTool´: the vendor's preferred cat tool.
-    2. The subclass ´PrefVendor´, for the preferred vendors, that has 2 class attributes: ´Preferred´ by default set to True, and ´Status´ by default set to "Preferred".
-        It is possible to change those values using the change_status function.
-"""
-
 import argparse
 import re
 import pandas as pd
 import os
 import pyinputplus as pyip
 
-def change_dictionary_value(dictionary, key, index, new_value):
-    if key in dictionary and index in dictionary[key]:
-        dictionary[key][index] = new_value
-        return True
-    else:
-        return False
+def ChangeDictionaryValue(Dictionary, Key, Index, NewValue):
+    if Key in Dictionary and Index in Dictionary[Key]:
+        Dictionary[Key][Index] = NewValue
+def CheckVendorMail(VendorMail):
+    regex_mail = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$" #regex used to validate email
+    if type(VendorMail) != str:
+        raise TypeError ("VendorMail should be a string!")
+    if not(re.search(regex_mail,VendorMail)):
+        raise ValueError("Please insert a valid email address.")
+def CheckWordRate(WordRate):
+    if type(WordRate) != float:
+        raise TypeError("WordRate should be a float!")
+    if WordRate > 0.15:
+        raise ValueError("This vendor is too expensive, pick another one.")
+    if WordRate == 0.00:
+        raise ValueError("Word rate cannot be 0.00.")
+def CheckCatTool(CatTool):
+    if type(CatTool) != str:
+        raise TypeError("CatTool should be a string!")
+    if not CatTool in VendorData.CatTools:
+            raise ValueError("This CAT tool is not valid. Run 'VendorData.CatTools' to check options.") 
 
 class VendorData:
-    CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"]
+    CatTools = ["XTM", "Trados Studio", "MemoQ", "Memsource"] 
     
-    def __init__(self, ProjectName, SourceLang, VendorName, TargLang, WordRate = None, Preferred = None, VendorMail = "", CatTool = "XTM"):
-        """ Instantiate
-        Args:
-            "VendorName" (str): First and last name of the vendor
-            "VendorMail" (str): the vendor's email address
-            "TargLang" (str): Language the vendor will be translating to
-            "WordRate" (float): Vendor's word rate for new words in Euro
-            "CatTool" (str): Vendor's preferred CAT-tool
-            """  
-        """
-        Exceptions:
-            VendorName should be a string, if not a TypeError is raised.
-            TargLang should be a string, if not a TypeError is raised.
-            WordRate should be a float, if not a TypeError is raised.
-            WordRate should NOT be > 0.15, if not a ValueError is raised.
-            VendorMail should be a string, if not a TypeError is raised.
-            VendorMail should be an email, if not a ValueError is raised.
-            CatTool should be a string, if not a TypeError is raised.
-            CatTool should be one of the options in the list "CatTools", if not a ValueError is raised.
-        """
-        regex_mail = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$" #regex used to validate email
-        
-        
+    def __init__(self, ProjectName, SourceLang, TargLang, VendorName, VendorMail = "", WordRate = None, CatTool = "XTM", Preferred = None):
         if type(ProjectName) != str:
             raise TypeError("ProjectName should be a string!")
-        else:
-            self.ProjectName = ProjectName
         if type(SourceLang) != str:
             raise TypeError("SourceLang should be a string!")
-        else:
-            self.SourceLang = SourceLang
-        if type(VendorName) !=str:
-            raise TypeError("VendorName should be a string!")
-        else:
-            self.VendorName = VendorName
-            
         if type(TargLang) != str:
             raise TypeError("TargLang should be a string!")
-        else:
-            self.TargLang = TargLang
-            
-        if WordRate:
-            if type(WordRate) != float:
-                raise TypeError("WordRate should be a float!")
-            if WordRate > 0.15:
-                raise ValueError("This vendor is too expensive, pick another one.")
-            if WordRate == 0.00:
-                raise ValueError("Word rate cannot be 0.00.")
-        else:
-            self.WordRate = WordRate
-            
+        if type(VendorName) !=str:
+            raise TypeError("VendorName should be a string!")
+        if VendorMail:
+            CheckVendorMail(VendorMail)   
+        if WordRate != None:
+            CheckWordRate(WordRate)
+        if CatTool:
+            CheckCatTool(CatTool)
         if Preferred != None:
-            if Preferred == True:
+            if Preferred:
                 self.Status = "Preferred"
             elif Preferred == False:
                 self.Status = "Back-up"
         else:
             self.Status = "Potential"
             
-        if VendorMail: 
-            if type(VendorMail) != str:
-                raise TypeError ("VendorMail should be a string!")
-            if(re.search(regex_mail,VendorMail)):
-                self.VendorMail = VendorMail
-            else:
-                raise ValueError("Please insert a valid email address.")
-        else:
-            self.VendorMail = VendorMail
-            
-        if type(CatTool) != str:
-            raise TypeError("CatTool should be a string!")
-        else:
-            self.CatTool = CatTool
-        if CatTool in VendorData.CatTools:
-            self.CatTool = CatTool
-        else:
-            raise ValueError("This CAT tool is not valid. Run 'VendorData.CatTools' to check options.")
+        self.ProjectName = ProjectName
+        self.SourceLang = SourceLang
+        self.VendorName = VendorName
+        self.TargLang = TargLang
+        self.WordRate = WordRate
+        self.VendorMail = VendorMail
+        self.CatTool = CatTool
         
-    def set_wordrate(self, NewRate):
-        if type(NewRate) != float:
-            raise TypeError("WordRate should be a float!")
-        elif NewRate > 0.15:
-            raise ValueError("This vendor is too expensive, consider another one.")
-        elif NewRate == 0.00:
-                raise ValueError("Word rate cannot be 0.00.")
-        else:
-            self.WordRate = NewRate
+    def SetVendorMail(self, NewMail):
+        CheckVendorMail(NewMail)
+        self.VendorMail = NewMail
+        
+    def SetWordRate(self, NewRate):
+        CheckWordRate(NewRate)
+        self.WordRate = NewRate
+    
+    def ChangeTool (self, NewTool):
+        CheckCatTool(NewTool)
+        self.CatTool = NewTool
 
-    def set_status(self, PrefVend):
-        if PrefVend == True:
-            self.Status = "Preferred"
-        elif PrefVend == False:
-            self.Status = "Back-up"
+    def SetStatus(self, PrefVend):
+        if PrefVend != None:
+            if PrefVend:
+                self.Status = "Preferred"
+            elif PrefVend == False:
+                self.Status = "Back-Up"
         else:
-            self.Status = "Potential"
-            
-    def set_mail(self,mail):
-        regex_mail = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$" #regex used to validate email
-        if (re.search(regex_mail,mail)):
-            self.VendorMail = mail
-        else:
-            raise ValueError("Please insert a valid email address.")
-    
-    def change_tool (self, tool):
-        if type(tool) != str:
-            raise TypeError("CatTool should be a string!")
-        elif tool not in VendorData.CatTools:
-            raise ValueError("This CAT tool is not valid. Run 'VendorData.CatTools' to check options.")
-        else:
-            self.CatTool = tool
-    
+            self.Status = "Potential"                  
    
-    def to_excel (self):
+    def ToExcel(self):
         data = {
             "Target Language": [self.TargLang],
             "Vendor": [self.VendorName],
@@ -155,13 +94,11 @@ class VendorData:
         }
         filename = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
         df = pd.DataFrame(data)
-        if os.path.exists(filename) != True:
+        if not os.path.exists(filename):
             df.to_excel(filename, index=False, sheet_name="VendorData")
         else:
             with pd.ExcelWriter(filename, mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
-
-# don't forget to properly dcument them with docstrings!!
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -169,7 +106,7 @@ if __name__ == "__main__":
     parser.add_argument ("-m", "--modify", action='store_true', help = "Modify an existing vendor")
     args = parser.parse_args()
     
-    if args.add == True:
+    if args.add:
         done = "no"
         WordRate = None
         Preferred = None
@@ -180,62 +117,73 @@ if __name__ == "__main__":
             SourceLang = pyip.inputStr("What is the source language? ")
             VendorName = pyip.inputStr("What's the vendor's name? ")
             TargLang = pyip.inputStr("Into which language will the vendor translate? ")
-            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
-            VendorWordRate = NewWordRate if NewWordRate else WordRate
-            NewPreferred = pyip.inputBool("True or False: Is this vendor a preferred vendor? If neither, leave blank. ", blank = True, default=None)
-            Preferred = NewPreferred if NewPreferred else Preferred
             NewVendorMail = pyip.inputStr("What is the vendor's email address? ", blank = True, default="")
-            VendorMail = NewVendorMail if NewVendorMail else VendorMail
+            if NewVendorMail:
+                CheckVendorMail(NewVendorMail)
+                VendorMail = NewVendorMail
+            else:
+                VendorMail = VendorMail
+            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
+            if NewWordRate != None:
+                CheckWordRate(NewWordRate)
+                VendorWordRate = NewWordRate
+            else:
+                WordRate = WordRate
+            NewPreferred = pyip.inputBool("True or False: Is this vendor a preferred vendor? If neither, leave blank. ", blank = True, default=None)
             NewCatTool= pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "Memsource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
             CatTool = NewCatTool if NewCatTool else CatTool
+            Preferred = NewPreferred if NewPreferred else Preferred
             done = pyip.inputStr("Are you done? ")
-            if done.lower() == "yes":
-                Vndr=VendorData(ProjectName, SourceLang, VendorName, TargLang, WordRate, Preferred, VendorMail, CatTool)
-                Excel = pyip.inputStr("Do you want add this vendor to the excel file? ")
-                if Excel.lower() == "yes":
-                    Vndr.to_excel()
-    if args.modify == True:
+
+        Vndr=VendorData(ProjectName, SourceLang, TargLang, VendorName, VendorMail, WordRate, CatTool, Preferred)
+        Excel = pyip.inputStr("Do you want to add this vendor to the excel file? ")
+        if Excel.lower() == "yes":
+            Vndr.ToExcel()
+    if args.modify:
         done = "no"
         while done.lower() != "yes":
             ProjectName = pyip.inputStr("What is the name of the project that the vendor you want to modify works on? ")
             SourceLang = pyip.inputStr("What is the source language? ")
-            filename = "_".join([str(ProjectName), str(SourceLang)]) + ".xlsx"
-            if os.path.exists(filename):
-                excel_records = pd.read_excel(filename)
-                excel_records_df = excel_records.loc[:, ~excel_records.columns.str.contains('^Unnamed')]
-                VendorDict=excel_records_df.to_dict()
+            FileName = "_".join([str(ProjectName), str(SourceLang)]) + ".xlsx"
+            if os.path.exists(FileName):
+                ExcelRecords = pd.read_excel(FileName)
+                ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')]
+                VendorDict=ExcelRecordsDf.to_dict()
 
-                vendors = VendorDict["Vendor"]
+                Vendors = VendorDict["Vendor"]
                 print ("These are the vendor's already in the database: ")
-                for index, vendor_name in vendors.items():
-                    print(f"{index}: {vendor_name}")
+                for index, VendorName in Vendors.items():
+                    print(f"{index}: {VendorName}")
                 
-                vendor_index = pyip.inputInt("Enter the index of the vendor you want to modify: ")
-                if vendor_index in vendors:
-                    vendor_key = "Vendor"
-                    email_key = "E-mail"
-                    cat_tool_key = "CAT Tool"
-                    word_rate_key = "Word Rate"
-                    status_key = "Status"
+                VendorIndex = pyip.inputInt("Enter the index of the vendor you want to modify: ")
+                if VendorIndex in Vendors:
+                    VendorKey = "Vendor"
+                    EmailKey = "E-mail"
+                    WordRateKey = "Word Rate"
+                    CatToolKey = "CAT Tool"
+                    StatusKey = "Status"
 
-                    new_email = pyip.inputStr("What is the vendor's e-mail? ", blank = True)
-                    new_cat_tool = pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "Memsource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
-                    new_word_rate = pyip.inputNum("What is the vendor's word rate? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
-                    new_status = pyip.inputMenu(["Potential", "Preferred", "Back-up"], prompt = "What is the vendor's new status? ", blank = True)
+                    NewEmail = pyip.inputStr("What is the vendor's e-mail? ", blank = True)
+                    if NewEmail:
+                        CheckVendorMail(NewEmail)
+                    NewWordRate = pyip.inputNum("What is the vendor's word rate? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
+                    if NewWordRate != None:
+                        CheckWordRate(NewWordRate)
+                    NewCatTool = pyip.inputMenu(["XTM", "Trados Studio", "MemoQ", "Memsource"], prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
+                    NewStatus = pyip.inputMenu(["Potential", "Preferred", "Back-up"], prompt = "What is the vendor's new status? ", blank = True)
                     done = pyip.inputStr("Are you done? ")
-            if done.lower() == "yes":
-
-                    if new_email:
-                        change_dictionary_value(VendorDict, email_key, vendor_index, new_email)
-                    if new_cat_tool:
-                        change_dictionary_value(VendorDict, cat_tool_key, vendor_index, new_cat_tool)
-                    if new_word_rate:
-                        change_dictionary_value(VendorDict, word_rate_key, vendor_index, new_word_rate)
-                    if new_status:
-                        change_dictionary_value(VendorDict, status_key, vendor_index, new_status)
-                    df = pd.DataFrame(VendorDict)
-                    with pd.ExcelWriter(filename, engine="openpyxl", mode="a", if_sheet_exists="replace") as writer:
-                        df.to_excel(writer, sheet_name = "VendorData", index=False)
-                        print("This vendor is modified correctly.")
             else:
                 print("A file for this project and this source language does not yet exist. Check the project name and source language.")
+
+        if NewEmail:
+            ChangeDictionaryValue(VendorDict, EmailKey, VendorIndex, NewEmail)
+        if NewWordRate:
+            ChangeDictionaryValue(VendorDict, WordRateKey, VendorIndex, NewWordRate)
+        if NewCatTool:
+            ChangeDictionaryValue(VendorDict, CatToolKey, VendorIndex, NewCatTool)
+        if NewStatus:
+            ChangeDictionaryValue(VendorDict, StatusKey, VendorIndex, NewStatus)
+        df = pd.DataFrame(VendorDict)
+        with pd.ExcelWriter(FileName, engine="openpyxl", mode="w") as writer:
+            df.to_excel(writer, sheet_name = "VendorData", index=False)
+            print("This vendor is modified correctly.")
