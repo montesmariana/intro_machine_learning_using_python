@@ -9,7 +9,7 @@ import argparse
 
 class Project:
 
-    def __init__(self, title, client, source, target, words, start, deadline, price, tm, translator = 'internal', revisor = 'internal', status = 'created', domain = ''):
+    def __init__(self, title, client, source, target, words, start, deadline, price, tm, translator = 'internal', reviewer = 'internal', status = 'created', domain = ''):
         """Initialises an object of the Project class, a class that represents a translation project of a translation agency.
         
             Args:
@@ -23,7 +23,7 @@ class Project:
                 price (float): Total price invoiced to the client (excl. VAT).
                 tm (bool): Whether a translation memory is available for this project.
                 translator (string, optional): Translator assigned to the project. Defaults to 'internal'.
-                revisor (string, optional): Revisor assigned to the project. Defaults to 'internal'.
+                reviewer (string, optional): Reviewer assigned to the project. Defaults to 'internal'.
                 status (string, optional): Current project status inside the agency's workflow. Defaults to 'created'.
                 domain (str, optional): Overall domain to which the project belongs. Defaults to an empty string.
         
@@ -37,6 +37,9 @@ class Project:
                 deadline (str): Project's deadline in ISO format (YYYY-MM-DD).
                 price (float): Total price invoiced to the client (excl. VAT).
                 tm (bool): Whether a translation memory is available for this project.
+                translator (string, optional): Translator assigned to the project.
+                reviewer (string, optional): Reviewer assigned to the project.
+                status (string, optional): Current project status inside the agency's workflow.
                 domain (str): Overall domain to which the project belongs.
                 today (date): Date of the day where the script is run.
                 st (date): Project's start date, turned from an ISO-formatted string into a date.
@@ -59,7 +62,7 @@ class Project:
                 TypeError: If 'price' is not a float.
                 TypeError: If 'tm' is not a boolean.
                 TypeError: If 'translator' is not a string.
-                TypeError: If 'revisor' is not a string.
+                TypeError: If 'reviewer' is not a string.
                 TypeError: If 'status' is not a string.
                 ValueError: If 'status' is not a label in the agency workflow: created, in translation, in revision, delivered, delayed, cancel(l)ed.
                 TypeError: If 'domain' is not a string.
@@ -110,12 +113,12 @@ class Project:
             self.translator = "internal"
         else:
             self.translator = translator
-        if type(revisor) != str:
-            raise TypeError("The revisor's name must be a string.")
-        elif revisor == '':
-            self.revisor = "internal"
+        if type(reviewer) != str:
+            raise TypeError("The reviewer's name must be a string.")
+        elif reviewer == '':
+            self.reviewer = "internal"
         else:
-            self.revisor = revisor
+            self.reviewer = reviewer
         if type(status) != str:
             raise TypeError("The status must be a string.")
         elif status == '':
@@ -175,14 +178,14 @@ class Project:
     def __str__(self):
         # defines the print behaviour: returns a text providing the main information about the project
         sent_1 = f"{self.title} is a translation for {self.client} from {self.source} into {self.target}."
-        if self.translator == "internal" and self.revisor == "internal":
-            sent_2 = f"Both the translator and the revisor are agency collaborators."
-        elif self.translator == "internal" and self.revisor != "internal":
-            sent_2 = f"The translator is an agency collaborator and the revisor is {self.revisor}."
-        elif self.translator != "internal" and self.revisor == "internal":
-            sent_2 = f"The translator is {self.translator} and the revisor is an agency collaborator."
+        if self.translator.lower() == "internal" and self.reviewer.lower() == "internal":
+            sent_2 = f"Both the translator and the reviewer are agency collaborators."
+        elif self.translator.lower() == "internal" and self.reviewer.lower() != "internal":
+            sent_2 = f"The translator is an agency collaborator and the reviewer is {self.reviewer}."
+        elif self.translator.lower() != "internal" and self.reviewer.lower() == "internal":
+            sent_2 = f"The translator is {self.translator} and the reviewer is an agency collaborator."
         else:
-            sent_2 = f"The translator is {self.translator} and the revisor is {self.revisor}."
+            sent_2 = f"The translator is {self.translator} and the reviewer is {self.reviewer}."
         # this if-statement considers whether a domain was added
         if len(self.domain) > 0:
             sent_3 = f"The domain is: {self.domain}."
