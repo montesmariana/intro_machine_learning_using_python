@@ -6,7 +6,7 @@ This repository has been created by Elmo Geeraerts for the final assignment of a
 The repository contains:
 - The `README.md` file which describes the repository and illustrates how to use the code as a module and by running the script;
 - The `tutorial.md` and `tutorial.ipynb` files which show how to actually use the code and the different functionalities;
-- The `example.json` file which allows the user to test out the code;
+- Two `xlsx` files which were generated while creating the `tutorial.ipynb` file. Be aware that if you run the code in the tutorial notebook, some data will be duplicated in the excel if you do not change anything. To avoid this you can delete the two excel files from the directory or you can change the data in the tutorial code to fit your needs.;
 - The `vendor_data.py` file, i.e. the actual python script that can be run or imported as a module.
 
 ## Installation and usage
@@ -32,16 +32,18 @@ Check out `tutorial.md` to see an example of the different functionalities of th
 You can also run the script directly with the following code in a console:
 
 ```sh
-python vendor_data.py <example.json>
+python vendor_data.py <"-a/--add or -m/--modify">
 ```
 
 Or in Jupyter notebook with:
 
 ```python
-%run vendor_data.py <example.json>
+%run vendor_data.py <"-a/--add or -m/--modify">
 ```
 
-In both cases `example.json` stands for the `filename` argument that the script needs. You can use [the file in this repository](example.json) or a similar file of yours. Find more information on how this script works with:
+Running vendor_data.py without either the argument -a (to add a new vendor) or -m (to modify an existing vendor) will not do anything. The argument -a prompts the user to add a new vendor. The data is provided by answering some questions regarding the vendor and the project. The argument -m prompts the user to modify an existing vendor. Again the data is provided by answering some questions regarding the vendor and the project.
+
+For more information you can run the command below, or check in the notebook tuturial.ipynb in this repository under "Running `vendor_data.py`".
 
 ```sh
 python vendor_data.py --help

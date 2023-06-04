@@ -301,8 +301,8 @@ if __name__ == "__main__":
                 VendorMail = NewVendorMail
             else:
                 VendorMail = VendorMail
-            NewWordRate = pyip.inputNum("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
-            if NewWordRate != None:
+            NewWordRate = pyip.inputFloat("What is the vendor's word rate in EUR? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
+            if NewWordRate:
                 CheckWordRate(NewWordRate)
                 VendorWordRate = NewWordRate
             else:
@@ -351,8 +351,8 @@ if __name__ == "__main__":
                     NewEmail = pyip.inputStr("What is the vendor's e-mail? ", blank = True)
                     if NewEmail:
                         CheckVendorMail(NewEmail)
-                    NewWordRate = pyip.inputNum("What is the vendor's word rate? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
-                    if NewWordRate != None:
+                    NewWordRate = pyip.inputFloat("What is the vendor's word rate? Should be between 0.01 and 0.15. If higher, choose another vendor. ", blank = True)
+                    if NewWordRate:
                         CheckWordRate(NewWordRate)
                     NewCatTool = pyip.inputMenu(VendorData.CatTools, prompt = "In which tool will the vendor be working?", blank = True, default = "XTM")
                     NewStatus = pyip.inputMenu(VendorData.Statuses, prompt = "What is the vendor's new status? ", blank = True)
