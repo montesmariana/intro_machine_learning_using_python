@@ -130,6 +130,9 @@ class VendorData:
             CheckWordRate(WordRate)
         if CatTool: #validate CAT Tool if one is provided
             CheckCatTool(CatTool)
+        if Preferred != None:
+            if type(Preferred) != bool:
+                raise TypeError("Preferred should either be True, False or None.")
         if Preferred != None: #if Preferred is set to True, status will be preferred, if set to False, back-up and if neither "Potential"
             if Preferred:
                 self.Status = "Preferred"
@@ -145,6 +148,7 @@ class VendorData:
         self.WordRate = WordRate
         self.VendorMail = VendorMail
         self.CatTool = CatTool
+        self.Preferred = Preferred
         
     def SetVendorMail(self, NewMail):
         """Method
@@ -180,12 +184,18 @@ class VendorData:
             PrefVend (bool): new value for Preferred, has an influence on status
         """
         if PrefVend != None:
-            if PrefVend:
+            if type(PrefVend) != bool:
+                raise TypeError("Preferred should either be True, False or None.")
+        if PrefVend != None:
+            if PrefVend == True:
+                self.Preferred = True
                 self.Status = "Preferred"
             elif PrefVend == False:
-                self.Status = "Back-Up"
+                self.Preferred = False
+                self.Status = "Back-up"
         else:
-            self.Status = "Potential"                  
+            self.Preferred = None
+            self.Status = "Potential"             
    
     def ToExcel(self): #method to write data to an excel file
         Data = { #dump arguments provided in a dictionary
@@ -205,13 +215,16 @@ class VendorData:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
     def ReadExcel(self): #method to read the file with filename {ProjectName_SourceLang} into a dictionary
         FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
-        ExcelRecords = pd.read_excel(FileName) #read filename
-        ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')] #remove any unnamed columns
-        VendorDict = ExcelRecordsDf.to_dict() #turn dataframe into a dictionary
-        return VendorDict #print the Dictionary
+        if os.path.exists(FileName):
+            ExcelRecords = pd.read_excel(FileName) #read filename
+            ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')] #remove any unnamed columns
+            VendorDict = ExcelRecordsDf.to_dict() #turn dataframe into a dictionary
+            return VendorDict #print the Dictionary
+        else:
+            raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
     
     def ModExcel(self, Key, Index, NewValue):
-        """Method to modify excel name
+        """Method to modify existing vendor in excel file
 
         Args:
             Key (str): one of the modifiable keys in VendorData.Keys
@@ -244,6 +257,8 @@ class VendorData:
             df = pd.DataFrame(VendorDict) #turn VendorDict dictionary back into a panda DataFrame
             with pd.ExcelWriter(FileName, engine="openpyxl", mode="w") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", index=False) #overwrite the existing excel file
+        else:
+            raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
 
 if __name__ == "__main__":
     """Parse command line arguments to provide arguments when the code is run
