@@ -9,7 +9,21 @@ import argparse
 
 class Project:
 
-    def __init__(self, title, client, source, target, words, start, deadline, price, tm, translator = 'internal', revisor = 'internal', status = 'created', domain = ''):
+    def __init__(
+        self,
+        title,
+        client,
+        source,
+        target,
+        words,
+        start,
+        deadline,
+        price,
+        tm,
+        translator = 'internal',
+        revisor = 'internal',
+        status = 'created',
+        domain = ''):
         """Initialises an object of the Project class, a class that represents a translation project of a translation agency.
         
             Args:
