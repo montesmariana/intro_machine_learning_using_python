@@ -103,14 +103,18 @@ class Project:
             self.words = words
         if type(start) != str:
             raise TypeError("The start date must be provided as a string.")
-        elif not re.match ("[0-9]{4}-[0-9]{2}-[0-9]{2}", start):
-            raise ValueError("A valid start date must be provided in ISO format.")
+        try:
+            self.st = datetime.date.fromisoformat(start)
+        except:
+            raise TypeError("The start date must be provided in ISOFormat")
         else:
             self.start = start
         if type(deadline) != str:
             raise TypeError("The deadline must be provided as a string.")
-        elif not re.match ("[0-9]{4}-[0-9]{2}-[0-9]{2}", deadline):
-            raise ValueError("A valid deadline must be provided in ISO format.")
+        try:
+            self.dl = datetime.date.fromisoformat(deadline)
+        except:
+            raise TypeError("The start deadline must be provided in ISOFormat")
         else:
             self.deadline = deadline
         if type(price) != float:
@@ -153,8 +157,6 @@ class Project:
             self.domain = domain
                 
         today = datetime.date.today()
-        self.st = datetime.date.fromisoformat(start)
-        self.dl = datetime.date.fromisoformat(deadline)
         self.daysleft = self.dl - today
         self.length = self.dl - self.st
         self.rate = self.price/self.words
