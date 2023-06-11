@@ -226,4 +226,5 @@ if __name__ == "__main":
     proj = Project(args.title, args.client, args.source, args.target, args.words, args.start, args.deadline, args.price, args.tm, args.translator, args.revisor, args.status, args.domain)
     proj.days_left()
     proj.project_length()
+    print(proj)
     
