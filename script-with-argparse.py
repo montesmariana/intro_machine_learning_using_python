@@ -201,21 +201,13 @@ class Project:
         return "\n".join([sent_1, sent_2, sent_3, sent_4, sent_5, sent_6, sent_7])
 
 if __name__ == "__main":
-    parser = argparse.ArgumentParser("project")
-    parser.add_argument("title", type=str, help="Title of the project")
-    parser.add_argument("client", type=str, help="Client who ordered the translation")
-    parser.add_argument("source", type=str, help="Source language")
-    parser.add_argument("target", type=str, help="Target language")
-    parser.add_argument("words", type=int, help="Project word count")
-    parser.add_argument("start", type=str, help="Project start date")
-    parser.add_argument("deadline", type=str, help="Project deadline")
-    parser.add_argument("price", type=float, help="Total price project")
-    parser.add_argument("tm", type=bool, help="Whether a translation memory is available")
-    parser.add_argument("--translator", type=str, default = "internal", help="Translator assigned to the project")
-    parser.add_argument("--revisor", type=str, default = "internal",help="Revisor assigned to the project")
-    parser.add_argument("--status", type=str, default = "created",
-                            choices = ["created", "in translation", "in revision", "delivered", "delayed", "cancelled", "canceled"], help="Project status in the agency workflow")
-    parser.add_argument("--domain", type=str, default = "", help="Overall domain of the text")
+    parser = argparse.ArgumentParser(
+        "project",
+        description = "Read a project list and print the project information.",
+        epilog = "You get an overview of the agency's projects.")
+    parser.add_argument("filename",
+                        type=argparse.FileType("r", encoding="utf-8"),
+                        help="The list of translation projects")
     args = parser.parse_args()
     proj = Project(args.title, args.client, args.source, args.target, args.words, args.start, args.deadline, args.price, args.tm, args.translator, args.revisor, args.status, args.domain)
     proj.days_left()
