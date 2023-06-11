@@ -9,15 +9,7 @@
             `CheckCatTool` to validate the CAT tool provided.
         - 1 class, `VendorData` that has 3 class attributes: `CatTools`, the CAT Tools that can be used for the project,
             `Keys`, the keys of the dictionary that can be modified, and `Statuses`, the possible statuses a vendor can have.
-            The class takes 4 positional arguments and 4 optional arguments:
-                1. `ProjectName` (str): the name of the translation project
-                2. `SourceLang` (str): the source language, i.e. the language the translator will translate from
-                3. `TargLang` (str): the target language, i.e. the language the translator will translate into
-                4. `VendorName` (str): the translator's/vendor's name
-                5. `VendorMail` (str): the vendor's e-mail address, by default empty
-                6. `WordRate` (float): the vendor's word rate in EUR/word, by default set to "None"
-                7. `CatTool` (str): the CAT Tool the translator will use, by default set to "XTM"
-                8. `Preferred` (bool): indicates if a vendor is a preferred vendor or not, by default set to "None"
+            The class takes 4 positional arguments and 4 optional arguments.
         - `Argparse` inside `if __name__ == "__main__":` statement to receive arguments when the script is run
     """
 #Import some python packages that will be needed:
@@ -27,9 +19,9 @@ import pandas as pd #pandas package to write excel file
 import os #os package to check if files exists
 import pyinputplus as pyip #pyinputplus package to facilitate providing arguments
 
-#4 methods to make validation easier
+#4 functions to make validation easier
 def ChangeDictionaryValue(Dictionary, Key, Index, NewValue):
-    """ChangeDictionaryValue, change values of a dictionary
+    """Function to change the value of a certain key in a certain dictionary.
 
     Args:
         Dictionary (dict): name of the dictionary that will be read
@@ -40,7 +32,7 @@ def ChangeDictionaryValue(Dictionary, Key, Index, NewValue):
     if Key in Dictionary and Index in Dictionary[Key]:
         Dictionary[Key][Index] = NewValue
 def CheckVendorMail(VendorMail):
-    """CheckVendorMail, validate e-mail address
+    """Function to validate the e-mail address.
 
     Args:
         VendorMail (str): an e-mail address
@@ -55,7 +47,7 @@ def CheckVendorMail(VendorMail):
     if not(re.search(regex_mail,VendorMail)):
         raise ValueError("Please insert a valid email address.")
 def CheckWordRate(WordRate):
-    """CheckWordRate, validate word rate
+    """Function to validate the word rate
 
     Args:
         WordRate (float): a word rate in EUR/word
@@ -64,6 +56,7 @@ def CheckWordRate(WordRate):
         TypeError:  if the argument provided is not a float, a TypeError is raised
         ValueError: the argument provided should not be higher than 0.15
         ValueError: the argument provided should not be 0.00
+        ValueError: the argument provided should not be negative.
     """
     if type(WordRate) != float:
         raise TypeError("WordRate should be a float!")
@@ -71,20 +64,22 @@ def CheckWordRate(WordRate):
         raise ValueError("This vendor is too expensive, pick another one.")
     if WordRate == 0.00:
         raise ValueError("Word rate cannot be 0.00.")
+    if WordRate < 0.00:
+        raise ValueError("Word rate cannot be negative.")
 def CheckCatTool(CatTool):
-    """CheckCatTool, validate CatTOol
+    """Function to validate the chosen CAT Tool
 
     Args:
         CatTool (str): a CAT Tool
 
     Raises:
         TypeError: if the argument provided is not string, a TypeError is raised
-        ValueError: the argument provided should be one of the four CAT Tools in the list ["XTM", "Trados Studio", "MemoQ", "Memsource"]
+        ValueError: the argument provided should be one of the four CAT Tools in the list VendorData.CatTools
     """
     if type(CatTool) != str:
         raise TypeError("CatTool should be a string!")
-    if not CatTool in ["XTM", "Trados Studio", "MemoQ", "Memsource"]:
-            raise ValueError("This CAT tool is not valid. Run 'VendorData.CatTools' to check options.") 
+    if not CatTool in VendorData.CatTools:
+        raise ValueError("This CAT tool is not valid. Run 'VendorData.CatTools' to check options.") 
     
 class VendorData:
 
@@ -151,37 +146,54 @@ class VendorData:
         self.Preferred = Preferred
         
     def SetVendorMail(self, NewMail):
-        """Method
+        """Method to set new vendor mail
 
         Args:
             NewMail (str): a new e-mail address for a certain vendor
+        Function called:
+            CheckVendorMail(VendorMail)
+                Raises:
+                    TypeError: if the argument provided is not a string, a TypeError is raised
+                    ValueError: if the address provided does not conform with the regex string `regex_mail`, a ValueError is raised
         """
         CheckVendorMail(NewMail) #validate e-mail address
         self.VendorMail = NewMail #value of VendorMail is changed
         
     def SetWordRate(self, NewRate):
-        """Method
+        """Method to set new word rate
 
         Args:
             NewRate (float): a new word rate for a certain vendor
+        Function called:
+            CheckWordRate(WordRate)
+                Raises:
+                    TypeError:  if the argument provided is not a float, a TypeError is raised
+                    ValueError: the argument provided should not be higher than 0.15
+                    ValueError: the argument provided should not be 0.00
+                    ValueError: the argument provided should not be negative.
         """
         CheckWordRate(NewRate) #validate new word rate
         self.WordRate = NewRate #value of WordRate is changed
     
     def ChangeTool (self, NewTool):
-        """Method
+        """Method to change the chosen CAT Tool
 
         Args:
             NewTool (str): a new tool for a certain vendor
+        Function called:
+            CheckCatTool(CatTool)
+                Raises:
+                    TypeError: if the argument provided is not string, a TypeError is raised
+                    ValueError: the argument provided should be one of the four CAT Tools in the list VendorData.CatTools
         """
         CheckCatTool(NewTool) #validate new CAT Tool
         self.CatTool = NewTool #value of CatTool is changed
 
     def SetStatus(self, PrefVend):
-        """Method
+        """Method to set a new value for self.Preferred and self.Status
 
         Args:
-            PrefVend (bool): new value for Preferred, has an influence on status
+            PrefVend (bool or None): new value for Preferred, has an influence on status
         """
         if PrefVend != None:
             if type(PrefVend) != bool:
@@ -197,8 +209,18 @@ class VendorData:
             self.Preferred = None
             self.Status = "Potential"             
    
-    def ToExcel(self): #method to write data to an excel file
-        Data = { #dump arguments provided in a dictionary
+    def ToExcel(self):
+        """Method to write data of an instance of the class VendorData to an excel file
+
+        How it works:
+            1. The arguments provided are dumped into a dictionary called `Data`,
+            2. A variable `FileName` is created, the name will be the value for `self.ProjectName` and `self.SourceLang` joined by an underscore (_).
+            3. The dictionary `Data` is turned into a panda data frame.
+            4. The code checks if the file with the name created in the variable `FileName` exists.
+                4.1 If the file exists, the provided data is appended to the existing file.
+                4.2 if the file does not exist the provided data is written to a new file under the name created in the variable `FileName`.
+        """
+        Data = {
             "Target Language": [self.TargLang],
             "Vendor": [self.VendorName],
             "E-mail": [self.VendorMail],
@@ -206,20 +228,31 @@ class VendorData:
             "Word Rate": [self.WordRate],
             "Status": [self.Status]
         }
-        FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx" #the name of the excel file, based on arguments `ProjectName` and `SourceLang`
-        df = pd.DataFrame(Data) #make a panda dataframe out of the dictionary
-        if not os.path.exists(FileName): #check if the file exists, if not a new file is written
+        FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
+        df = pd.DataFrame(Data)
+        if not os.path.exists(FileName):
             df.to_excel(FileName, index=False, sheet_name="VendorData")
-        else: #if file exists, the data is appended to the existing file
+            return(f"The file {FileName} is correctly created and the vendor {self.VendorName} was added.")
+        else:
             with pd.ExcelWriter(FileName, mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
-    def ReadExcel(self): #method to read the file with filename {ProjectName_SourceLang} into a dictionary
+            return(f"The vendor {self.VendorName} was added to {FileName}.")
+
+    def ReadExcel(self):
+        """Method to read an existing excel file
+
+        Raises:
+            ValueError: if the file with the filename created in the variable `FileName` does not exist, you get a message saying a file for that project in that language does not exist.
+
+        Returns:
+            Dict: a dictionary containing the data in the excel file.
+        """
         FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
         if os.path.exists(FileName):
-            ExcelRecords = pd.read_excel(FileName) #read filename
-            ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')] #remove any unnamed columns
-            VendorDict = ExcelRecordsDf.to_dict() #turn dataframe into a dictionary
-            return VendorDict #print the Dictionary
+            ExcelRecords = pd.read_excel(FileName)
+            ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')]
+            VendorDict = ExcelRecordsDf.to_dict()
+            return VendorDict
         else:
             raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
     
@@ -234,6 +267,8 @@ class VendorData:
         Raises:
             ValueError: raised if the key is not one of the keys in VendorData.Keys
             ValueError: raised if the Index is not valid for a certain key
+            ValueError: if the provided Status  is not in the list VendorData.Statuses
+            All the errors in the functions `CheckVendorMail`, `CheckWordRate` and `CheckCatTool`
         """
         FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
         if os.path.exists(FileName):
@@ -244,19 +279,25 @@ class VendorData:
                 raise ValueError("Invalid key, run 'VendorData.Keys' to see options.")
             if not Index in VendorDict[Key]:
                 raise ValueError("Invalid index, run 'self.ReadExcel()' to see options")
-            if Key == "E-mail": #validate e-mail address if a value for the key E-mail is modified
+            if Key == "E-mail":
                 CheckVendorMail(NewValue)
-            if Key == "Word Rate": #validate word rate if a value for the key Word Rate is modified
+                self.VendorMail = NewValue
+            elif Key == "Word Rate":
                 CheckWordRate(NewValue)
-            if Key == "CAT Tool": #validate CAT Tool if a value for the key CAT Tool is modified
+                self.WordRate = NewValue
+            elif Key == "CAT Tool":
                 CheckCatTool(NewValue)
-            if Key == "Status": #validate Status if a value for the key Status is modified
+                self.CatTool = NewValue
+            elif Key == "Status":
                 if not NewValue in VendorData.Statuses:
                     raise ValueError("Invalid status, run 'VendorData.Statuses' to see options")
-            ChangeDictionaryValue(VendorDict, Key, Index, NewValue) #change the dictionary value in the dictionary `VendorDict` using the arguments provided for the method ModExcel
-            df = pd.DataFrame(VendorDict) #turn VendorDict dictionary back into a panda DataFrame
+                else:
+                    self.Status = NewValue
+            ChangeDictionaryValue(VendorDict, Key, Index, NewValue)
+            df = pd.DataFrame(VendorDict)
             with pd.ExcelWriter(FileName, engine="openpyxl", mode="w") as writer:
-                df.to_excel(writer, sheet_name = "VendorData", index=False) #overwrite the existing excel file
+                df.to_excel(writer, sheet_name = "VendorData", index=False)
+            return("The vendor was correctly modified.")
         else:
             raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
 
@@ -268,23 +309,11 @@ if __name__ == "__main__":
         --modify, -m (flag) : indicating the user wants to modify an existing vendor
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--add", action='store_true', help = "Add a vendor")
-    parser.add_argument ("-m", "--modify", action='store_true', help = "Modify an existing vendor")
+    parser.add_argument("-a", "--add", action='store_true', help = "Action: add a vendor. Prompts the user with some questions.")
+    parser.add_argument ("-m", "--modify", action='store_true', help = "Action: modify a vendor. Prompts the user with some questions.")
     args = parser.parse_args()
     
     if args.add:
-        """Action: add a vendor
-
-        Prompts the user to provide the following data, validates it and writes it to an excel file with {ProjectName_SourceLang} as name:
-            ProjectName (str): the name of the translation project
-            SourceLang (str): the source language, i.e. the language the translator will translate from
-            TargLang (str): the target language, i.e. the language the translator will translate into
-            VendorName (str): the translator's/vendor's name
-            VendorMail (str, optional): the vendor's e-mail address, by default empty
-            WordRate (float, optional): the vendor's word rate in EUR/word, by default set to "None"
-            CatTool (str, optional): the CAT Tool the translator will use, by default set to "XTM"
-            Preferred (bool, optional): indicates if a vendor is a preferred vendor or not, by default set to "None".  
-        """
         done = "no"
         WordRate = None
         Preferred = None
@@ -317,20 +346,18 @@ if __name__ == "__main__":
         Excel = pyip.inputStr("Do you want to add this vendor to the excel file? ") #user gets the chance to write data to excel
         if Excel.lower() == "yes":
             Vndr.ToExcel() #data written to excel
+            print("Vendor was added!")
+        else:
+            print ("Action was cancelled.")
     if args.modify:
-        """Action: modify an existing vendor
-        """
         done = "no"
         while done.lower() != "yes": #Code underneath is run as long as value for done = no
-            """Provide ProjectName and SourceLang to look for the excel file
+            """
             """
             ProjectName = pyip.inputStr("What is the name of the project that the vendor you want to modify works on? ")
             SourceLang = pyip.inputStr("What is the source language? ")
             FileName = "_".join([str(ProjectName), str(SourceLang)]) + ".xlsx"
             if os.path.exists(FileName):
-                """If the file exists, excel file is read and turned into a dictionary
-                Prompts the user to choose the vendor for which certain values will be changed.
-                """
                 ExcelRecords = pd.read_excel(FileName)
                 ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')]
                 VendorDict=ExcelRecordsDf.to_dict()
@@ -359,8 +386,6 @@ if __name__ == "__main__":
                     done = pyip.inputStr("Are you done? ")
             else:
                 print("A file for this project and this source language does not yet exist. Check the project name and source language.")
-        """Values for provided keys are changed
-        """
         if NewEmail:
             ChangeDictionaryValue(VendorDict, EmailKey, VendorIndex, NewEmail)
         if NewWordRate:

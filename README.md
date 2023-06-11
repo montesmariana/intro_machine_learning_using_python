@@ -6,7 +6,7 @@ This repository has been created by Elmo Geeraerts for the final assignment of a
 The repository contains:
 - The `README.md` file which describes the repository and illustrates how to use the code as a module and by running the script;
 - The `tutorial.md` and `tutorial.ipynb` files which show how to actually use the code and the different functionalities;
-- Two `xlsx` files which were generated while creating the `tutorial.ipynb` file. Be aware that if you run the code in the tutorial notebook, some data will be duplicated in the excel if you do not change anything. To avoid this you can delete the two excel files from the directory or you can change the data in the tutorial code to fit your needs.;
+- Two `xlsx` files which were generated while creating the `tutorial.ipynb` file. Be aware that if you run the code in the tutorial notebook, some data will be duplicated in the excel if you do not change anything. To avoid this you can delete the two excel files from the directory or you can change the data in the tutorial code to fit your needs. Or you could import the os package and run os.remove('path/to/the/file.xlsx);
 - The `vendor_data.py` file, i.e. the actual python script that can be run or imported as a module.
 
 ## Installation and usage
@@ -32,16 +32,24 @@ Check out `tutorial.md` to see an example of the different functionalities of th
 You can also run the script directly with the following code in a console:
 
 ```sh
-python vendor_data.py <"-a/--add or -m/--modify">
+python vendor_data.py <-a/--add>
 ```
+to add a vendor. You will be prompted with some questions to input the data. Or you can run:
+
+```sh
+python vendor_data.py <-m/modify>
+```
+to modify a vendor. Again you will be prompted with some questions to input the data.
 
 Or in Jupyter notebook with:
 
 ```python
-%run vendor_data.py <"-a/--add or -m/--modify">
+%run vendor_data.py <-a/--add>
 ```
-
-Running vendor_data.py without either the argument -a (to add a new vendor) or -m (to modify an existing vendor) will not do anything. The argument -a prompts the user to add a new vendor. The data is provided by answering some questions regarding the vendor and the project. The argument -m prompts the user to modify an existing vendor. Again the data is provided by answering some questions regarding the vendor and the project.
+OR
+```python
+%run vendor_data.py <-m/--modify>
+```
 
 For more information you can run the command below, or check in the notebook tuturial.ipynb in this repository under "Running `vendor_data.py`".
 
@@ -62,4 +70,7 @@ The main advantage of this script is that it limits the posibilities of CAT tool
 There are limits to this script that - with more practice, knowledge and time - might be resolved in the form of new functionalities.
 With this script you CANNOT:
 - Look up specific vendors;
-- Joining multiple excel files in the excel file created by this code.
+- Join multiple excel files in the excel file created by this code.
+- not create multiple entries for the same vendor if the excel file already exists and the ToExcel() method is called multiple times for the same vendor.
+- delete vendors from the file;
+- modify multiple keys in a dictionary if the script is imported as a module.
