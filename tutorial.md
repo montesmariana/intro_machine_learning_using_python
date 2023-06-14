@@ -10,7 +10,7 @@ We'll begin with importing the code as module:
 
 ```python
 import sys
-sys.path.append ('..\Final_Assignment1')
+sys.path.append ('..\Final_Assignment1') #this is the relative path to where the script lives. If the file where the script lives has a different name than 'Final_Assignment1' you should change this.
 import vendor_data as vd # 'as vd' is not necessary but makes it shorter.
 ```
 
