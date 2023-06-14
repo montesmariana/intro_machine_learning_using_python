@@ -6,7 +6,7 @@ This repository has been created by Elmo Geeraerts for the final assignment of a
 The repository contains:
 - The `README.md` file which describes the repository and illustrates how to use the code as a module and by running the script;
 - The `tutorial.md` and `tutorial.ipynb` files which show how to actually use the code and the different functionalities;
-- Two `xlsx` files which were generated while creating the `tutorial.ipynb` file. Be aware that if you run the code in the tutorial notebook, some data will be duplicated in the excel if you do not change anything. To avoid this you can delete the two excel files from the directory or you can change the data in the tutorial code to fit your needs. Or you could import the os package and run os.remove('path/to/the/file.xlsx);
+- The `Example_English.xlsx` and `Example_Dutch.xlsx` files you can use during the tutorial when you import the code. You could also write and use your own file. How to write your own file using the script is also explained in the tutorial;
 - The `vendor_data.py` file, i.e. the actual python script that can be run or imported as a module.
 
 ## Installation and usage
@@ -32,23 +32,23 @@ Check out `tutorial.md` to see an example of the different functionalities of th
 You can also run the script directly with the following code in a console:
 
 ```sh
-python vendor_data.py <-a/--add>
+python vendor_data.py -a/--add
 ```
 to add a vendor. You will be prompted with some questions to input the data. Or you can run:
 
 ```sh
-python vendor_data.py <-m/modify>
+python vendor_data.py -m/--modify
 ```
 to modify a vendor. Again you will be prompted with some questions to input the data.
 
 Or in Jupyter notebook with:
 
 ```python
-%run vendor_data.py <-a/--add>
+%run vendor_data.py -a/--add
 ```
 OR
 ```python
-%run vendor_data.py <-m/--modify>
+%run vendor_data.py -m/--modify
 ```
 
 For more information you can run the command below, or check in the notebook tuturial.ipynb in this repository under "Running `vendor_data.py`".
@@ -69,8 +69,8 @@ The main advantage of this script is that it limits the posibilities of CAT tool
 ## What this script CANNOT do
 There are limits to this script that - with more practice, knowledge and time - might be resolved in the form of new functionalities.
 With this script you CANNOT:
-- Look up specific vendors;
-- Join multiple excel files in the excel file created by this code.
-- not create multiple entries for the same vendor if the excel file already exists and the ToExcel() method is called multiple times for the same vendor.
-- delete vendors from the file;
-- modify multiple keys in a dictionary if the script is imported as a module.
+- Look up vendors or information for vendors in the excel file
+- Read other excel files and instantiating the class VendorData based on the information in those excel files 
+- Check if a vendor already exists in the excel file when the method ToExcel() is called multiple times
+- Delete vendors from the file
+- Modify multiple keys in a dictionary if the script is imported as a module.

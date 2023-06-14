@@ -152,9 +152,9 @@ class VendorData:
             NewMail (str): a new e-mail address for a certain vendor
         Function called:
             CheckVendorMail(VendorMail)
-                Raises:
-                    TypeError: if the argument provided is not a string, a TypeError is raised
-                    ValueError: if the address provided does not conform with the regex string `regex_mail`, a ValueError is raised
+        Raises:
+            TypeError: if the argument provided is not a string, a TypeError is raised
+            ValueError: if the address provided does not conform with the regex string `regex_mail`, a ValueError is raised
         """
         CheckVendorMail(NewMail) #validate e-mail address
         self.VendorMail = NewMail #value of VendorMail is changed
@@ -166,11 +166,11 @@ class VendorData:
             NewRate (float): a new word rate for a certain vendor
         Function called:
             CheckWordRate(WordRate)
-                Raises:
-                    TypeError:  if the argument provided is not a float, a TypeError is raised
-                    ValueError: the argument provided should not be higher than 0.15
-                    ValueError: the argument provided should not be 0.00
-                    ValueError: the argument provided should not be negative.
+        Raises:
+            TypeError:  if the argument provided is not a float, a TypeError is raised
+            ValueError: the argument provided should not be higher than 0.15
+            ValueError: the argument provided should not be 0.00
+            ValueError: the argument provided should not be negative.
         """
         CheckWordRate(NewRate) #validate new word rate
         self.WordRate = NewRate #value of WordRate is changed
@@ -182,9 +182,9 @@ class VendorData:
             NewTool (str): a new tool for a certain vendor
         Function called:
             CheckCatTool(CatTool)
-                Raises:
-                    TypeError: if the argument provided is not string, a TypeError is raised
-                    ValueError: the argument provided should be one of the four CAT Tools in the list VendorData.CatTools
+        Raises:
+            TypeError: if the argument provided is not string, a TypeError is raised
+            ValueError: the argument provided should be one of the four CAT Tools in the list VendorData.CatTools
         """
         CheckCatTool(NewTool) #validate new CAT Tool
         self.CatTool = NewTool #value of CatTool is changed
@@ -215,7 +215,7 @@ class VendorData:
         How it works:
             1. The arguments provided are dumped into a dictionary called `Data`,
             2. A variable `FileName` is created, the name will be the value for `self.ProjectName` and `self.SourceLang` joined by an underscore (_).
-            3. The dictionary `Data` is turned into a panda data frame.
+            3. The dictionary `Data` is turned into pandas.
             4. The code checks if the file with the name created in the variable `FileName` exists.
                 4.1 If the file exists, the provided data is appended to the existing file.
                 4.2 if the file does not exist the provided data is written to a new file under the name created in the variable `FileName`.
@@ -232,11 +232,11 @@ class VendorData:
         df = pd.DataFrame(Data)
         if not os.path.exists(FileName):
             df.to_excel(FileName, index=False, sheet_name="VendorData")
-            return(f"The file {FileName} is correctly created and the vendor {self.VendorName} was added.")
+            print(f"The file {FileName} is correctly created and the vendor {self.VendorName} was added.")
         else:
             with pd.ExcelWriter(FileName, mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
                 df.to_excel(writer, sheet_name = "VendorData", startrow=writer.sheets["VendorData"].max_row, header = None, index=False)
-            return(f"The vendor {self.VendorName} was added to {FileName}.")
+            print(f"The vendor {self.VendorName} was added to {FileName}.")
 
     def ReadExcel(self):
         """Method to read an existing excel file
@@ -256,29 +256,27 @@ class VendorData:
         else:
             raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
     
-    def ModExcel(self, Key, Index, NewValue):
+    def ModExcel(self, Key, NewValue):
         """Method to modify existing vendor in excel file
 
         Args:
             Key (str): one of the modifiable keys in VendorData.Keys
-            Index (int): the index of the value that needs to be modified
-            NewValue : the new value of the index, type depends on the key, either str or float
+            NewValue: the new value for the key, type depends on the key, either str or float
 
         Raises:
             ValueError: raised if the key is not one of the keys in VendorData.Keys
-            ValueError: raised if the Index is not valid for a certain key
-            ValueError: if the provided Status  is not in the list VendorData.Statuses
+            ValueError: raised if the provided Status is not in the list VendorData.Statuses
             All the errors in the functions `CheckVendorMail`, `CheckWordRate` and `CheckCatTool`
         """
         FileName = "_".join([str(self.ProjectName), str(self.SourceLang)]) + ".xlsx"
         if os.path.exists(FileName):
-            ExcelRecords = pd.read_excel(FileName)
-            ExcelRecordsDf = ExcelRecords.loc[:, ~ExcelRecords.columns.str.contains('^Unnamed')]
-            VendorDict = ExcelRecordsDf.to_dict()
+            ExcelRecordsDf = pd.read_excel(FileName)
             if not Key in self.Keys:
                 raise ValueError("Invalid key, run 'VendorData.Keys' to see options.")
-            if not Index in VendorDict[Key]:
-                raise ValueError("Invalid index, run 'self.ReadExcel()' to see options")
+
+            VendorRow = ExcelRecordsDf[ExcelRecordsDf.Vendor == self.VendorName]
+            Index = VendorRow.index[0]
+
             if Key == "E-mail":
                 CheckVendorMail(NewValue)
                 self.VendorMail = NewValue
@@ -293,11 +291,13 @@ class VendorData:
                     raise ValueError("Invalid status, run 'VendorData.Statuses' to see options")
                 else:
                     self.Status = NewValue
-            ChangeDictionaryValue(VendorDict, Key, Index, NewValue)
-            df = pd.DataFrame(VendorDict)
+
+            ExcelRecordsDf.at[Index, Key] = NewValue
+
             with pd.ExcelWriter(FileName, engine="openpyxl", mode="w") as writer:
-                df.to_excel(writer, sheet_name = "VendorData", index=False)
-            return("The vendor was correctly modified.")
+                ExcelRecordsDf.to_excel(writer, sheet_name="VendorData", index=False)
+
+            print("The vendor was correctly modified.")
         else:
             raise ValueError(f"There is no file for {self.ProjectName} in {self.SourceLang}")
 
@@ -313,7 +313,10 @@ if __name__ == "__main__":
     parser.add_argument ("-m", "--modify", action='store_true', help = "Action: modify a vendor. Prompts the user with some questions.")
     args = parser.parse_args()
     
-    if args.add:
+    
+    if args.add and args.modify:
+        raise ValueError("Cannot run '--add/-a' and '--modify/-m' at the same time, provide one or the other.")
+    elif args.add:
         done = "no"
         WordRate = None
         Preferred = None
@@ -346,10 +349,9 @@ if __name__ == "__main__":
         Excel = pyip.inputStr("Do you want to add this vendor to the excel file? ") #user gets the chance to write data to excel
         if Excel.lower() == "yes":
             Vndr.ToExcel() #data written to excel
-            print("Vendor was added!")
         else:
             print ("Action was cancelled.")
-    if args.modify:
+    elif args.modify:
         done = "no"
         while done.lower() != "yes": #Code underneath is run as long as value for done = no
             """
